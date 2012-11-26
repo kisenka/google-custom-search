@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" src="../src/search.js"></script>
+<script type="text/javascript">
+window.onload = function()
+{
+    var s = new GoogleCustomSearch({
+        // take it from here https://code.google.com/apis/console/
+        googleApiKey: 'AIzaSyBf3nMB7quDenHfwwoQKXkT2vpJ4wNnRck',
+
+        // http://www.google.com/cse/
+        googleCustomSearchId: '006808882770449640747:oblas80q8sg',
+
+        processResults: function(results) {
+            console.log(results);
+        }
+    });
+
+    // form handler
+    document.getElementById('search-form').onsubmit = function() {
+        var queryInput = document.getElementById('search-query');
+
+        if (queryInput.value.length > 2) {
+            s.doSearch(queryInput.value);
+        }
+        return false;
+    }
+}
+</script>
+</head>
+<body>
+
+<form id="search-form" action="">
+    <input type="text" id="search-query" value="Obama">
+    <input type="submit">
+</form>
+
+<div id="rearch-results"></div>
+
+</body>
+</html>
