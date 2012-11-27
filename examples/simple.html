@@ -6,24 +6,47 @@
 <script type="text/javascript">
 window.onload = function()
 {
-    var s = new GoogleCustomSearch({
+    s = new GoogleCustomSearch({
         // take it from here https://code.google.com/apis/console/
         googleApiKey: 'AIzaSyBf3nMB7quDenHfwwoQKXkT2vpJ4wNnRck',
 
         // http://www.google.com/cse/
         googleCustomSearchId: '006808882770449640747:oblas80q8sg',
 
-        processResults: function(results) {
-            console.log(results);
-        }
+        // callback
+        onProcessResults: processSearchResults
     });
+
+    function processSearchResults(results) {
+        var that = this,
+            i, len,
+            item, resultsStr = '';
+
+        if (that.hasError) {
+            alert(that.error.message);
+        }
+        else {
+            //that.totalResults;
+            for (i = 0, len = results.items.length; i < len; i++) {
+                item = results.items[i];
+
+                resultsStr += '<li>';
+                resultsStr += '<a href="'+ item.link +'" target="_blank">' + item.htmlTitle + '</a>';
+                resultsStr += '<p>'+ item.htmlSnippet +'</p>'
+                resultsStr += '</li>';
+            }
+
+            document.getElementById('search-results').innerHTML = '<ul>'+ resultsStr +'</ul>';
+        }
+    }
+
 
     // form handler
     document.getElementById('search-form').onsubmit = function() {
-        var queryInput = document.getElementById('search-query');
+        var searchInput = document.getElementById('search-query');
 
-        if (queryInput.value.length > 2) {
-            s.doSearch(queryInput.value);
+        if (searchInput.value.length > 2) {
+            s.doSearch(searchInput.value);
         }
         return false;
     }
@@ -37,7 +60,7 @@ window.onload = function()
     <input type="submit">
 </form>
 
-<div id="rearch-results"></div>
+<div id="search-results"></div>
 
 </body>
 </html>
