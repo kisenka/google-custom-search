@@ -90,7 +90,7 @@
 
         totalResults: 0,
 
-        busy: false,
+        isBusy: false,
 
         results: null,
 
@@ -118,9 +118,9 @@
                     callback: __jsonpProxyFuncName
                 };
 
-            that.busy = true;
+            that.isBusy = true;
             createScript(searchUrl + '?' + objectToQueryString(searchParams), function() {
-                that.busy = false;
+                that.isBusy = false;
                 that.results = __jsonpProxyFunc.dataStorage;
 
                 if ('error' in that.results) {
