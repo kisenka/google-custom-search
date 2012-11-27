@@ -18,7 +18,7 @@
         arguments.callee.dataStorage = data;
     };
 
-    // helper to create a script-node for JSONP
+    // creates script-node for JSONP
     function createScript(url, callback) {
         var scriptNode,
             headNode = document.getElementsByTagName('head')[0],
@@ -43,7 +43,7 @@
         }
     }
 
-    // Object to query string
+    // object to query string
     function objectToQueryString(object) {
         var fld,
             paramPairStr = '',
@@ -53,6 +53,7 @@
             paramPairStr = fld + '=' + encodeURIComponent(object[fld]);
             paramsPairs.push(paramPairStr);
         }
+
         return paramsPairs.join('&');
     }
 
@@ -87,18 +88,20 @@
 
         currentPage: 1,
 
+        totalResults: 0,
+
         busy: false,
 
         results: null,
 
-        processResults: null,
+        hasError: false,
 
-        init: function() {
+        error: null,
+
+        onProcessResults: null,
+
+        init: function(options) {
             var that = this;
-
-            if (typeof that.processResults == 'function') {
-                that.processResults.call(that.results);
-            }
         },
 
         doSearch: function(query, pageNum) {
@@ -119,7 +122,19 @@
             createScript(searchUrl + '?' + objectToQueryString(searchParams), function() {
                 that.busy = false;
                 that.results = __jsonpProxyFunc.dataStorage;
-                that.processResults(that.results);
+
+                if ('error' in that.results) {
+                    that.hasError = true;
+                    that.error = that.results.error;
+                }
+                else if ('items' in that.results) {
+                    that.hasError = false;
+                    that.totalResults = that.results.searchInformation.totalResults;
+                }
+
+                if (typeof that.onProcessResults === 'function') {
+                    that.onProcessResults.call(that, that.results);
+                }
             });
         },
 
