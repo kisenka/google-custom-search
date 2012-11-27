@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="../src/search.js"></script>
+    <script type="text/javascript">
+        window.onload = function()
+        {
+            search = new GoogleCustomSearch({
+                // take it from here https://code.google.com/apis/console/
+                googleApiKey: 'AIzaSyBf3nMB7quDenHfwwoQKXkT2vpJ4wNnRck',
+
+                // http://www.google.com/cse/
+                googleCustomSearchId: '006808882770449640747:oblas80q8sg',
+
+                // callback
+                onProcessResults: function(results) {
+                    var that = this,
+                            i, len,
+                            item, resultsStr = '';
+
+                    if (that.hasError) {
+                        alert(that.error.message);
+                    }
+                    else if (results.items.length > 0) {
+                        for (i = 0, len = results.items.length; i < len; i++) {
+                            item = results.items[i];
+
+                            resultsStr += '<p>';
+                            resultsStr += '<a href="'+ item.link +'" target="_blank">'
+                                    + item.htmlTitle + '</a>';
+                            resultsStr += '<br>';
+                            resultsStr += item.htmlSnippet;
+                            resultsStr += '</p>';
+                        }
+
+                        document.getElementById('search-results').innerHTML = resultsStr;
+                    }
+                }
+            });
+
+
+            // form handler
+            document.getElementById('search-form').onsubmit = function() {
+                var searchInput = document.getElementById('search-query');
+
+                if (searchInput.value.length > 2 && !search.isBusy) {
+                    document.getElementById('search-results').innerHTML = 'loading...';
+                    window.location.hash = '#search=' + encodeURIComponent(searchInput.value);
+                    search.doSearch(searchInput.value);
+                }
+                return false;
+            };
+
+            // search onload
+            var searchInput = document.getElementById('search-query');
+            var hash = window.location.hash.substr(1);
+            var params = getParamsFromQueryString(hash);
+
+            if (hash !== '' && params !== null && params.search.length > 2) {
+                search.doSearch(params.search, 1);
+                searchInput.value = params.search;
+            }
+
+            window.addEventListener('hashchange', function() {
+                var hash = window.location.hash.substr(1);
+                var params = getParamsFromQueryString(hash);
+
+                if (hash !== '' && params !== null && params.search.length > 2) {
+                    search.doSearch(params.search, 1);
+                    searchInput.value(params.search);
+                }
+            }, false);
+
+
+            // helper func to extract params from query-string
+            function getParamsFromQueryString(queryString) {
+                var that = this,
+                        pairs = queryString.split('&'),
+                        pTmp,
+                        paramName, paramValue,
+                        params = {},
+                        i, len;
+
+                if (pairs.length === 0) {
+                    return null;
+                }
+
+                for (i = 0, len = pairs.length; i < len; i++) {
+                    pTmp = pairs[i].split('=');
+                    paramName = pTmp[0];
+                    paramValue = pTmp[1];
+                    params[paramName] = decodeURIComponent(paramValue);
+                }
+
+                return params;
+            }
+        }
+    </script>
+</head>
+<body>
+
+<form id="search-form" action="">
+    <input type="text" id="search-query" value="">
+    <input type="submit">
+</form>
+
+<div id="search-results"></div>
+
+</body>
+</html>
