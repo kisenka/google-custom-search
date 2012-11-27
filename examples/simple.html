@@ -22,7 +22,7 @@ window.onload = function()
             if (that.hasError) {
                 alert(that.error.message);
             }
-            else {
+            else if (results.items.length > 0) {
                 for (i = 0, len = results.items.length; i < len; i++) {
                     item = results.items[i];
 

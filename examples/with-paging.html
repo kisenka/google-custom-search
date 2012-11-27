@@ -23,7 +23,7 @@ window.onload = function()
             if (that.hasError) {
                 alert(that.error.code + ": " + that.error.message);
             }
-            else {
+            else if (results.items.length > 0) {
                 // create results HTML
                 for (i = 0, len = results.items.length; i < len; i++) {
                     item = results.items[i];
