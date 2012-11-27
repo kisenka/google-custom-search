@@ -26,17 +26,18 @@ window.onload = function()
             alert(that.error.message);
         }
         else {
-            //that.totalResults;
             for (i = 0, len = results.items.length; i < len; i++) {
                 item = results.items[i];
 
-                resultsStr += '<li>';
-                resultsStr += '<a href="'+ item.link +'" target="_blank">' + item.htmlTitle + '</a>';
-                resultsStr += '<p>'+ item.htmlSnippet +'</p>'
-                resultsStr += '</li>';
+                resultsStr += '<p>';
+                resultsStr += '<a href="'+ item.link +'" target="_blank">'
+                        + item.htmlTitle + '</a>';
+                resultsStr += '<br>';
+                resultsStr += item.htmlSnippet;
+                resultsStr += '</p>';
             }
 
-            document.getElementById('search-results').innerHTML = '<ul>'+ resultsStr +'</ul>';
+            document.getElementById('search-results').innerHTML = resultsStr;
         }
     }
 
@@ -46,6 +47,7 @@ window.onload = function()
         var searchInput = document.getElementById('search-query');
 
         if (searchInput.value.length > 2) {
+            document.getElementById('search-results').innerHTML = 'loading...';
             s.doSearch(searchInput.value);
         }
         return false;
