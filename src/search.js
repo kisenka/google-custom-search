@@ -84,15 +84,15 @@
 
         currentQuery: null,
 
-        perPage: 10,
+        count: 10,
 
         currentPage: 1,
 
         totalResults: 0,
 
-        isBusy: false,
-
         results: null,
+
+        isBusy: false,
 
         hasError: false,
 
@@ -106,16 +106,16 @@
 
         doSearch: function(query, pageNum) {
             var that = this,
-                perPage = that.perPage,
-                pageNum = (typeof pageNum !== 'undefined') ? pageNum : that.currentPage,
-                start = ((pageNum * perPage) - perPage) + 1,
+                count = that.count,
+                pageNum = (typeof pageNum != 'undefined') ? pageNum : that.currentPage,
+                start = ((pageNum * count) - count) + 1,
                 searchUrl = 'https://www.googleapis.com/customsearch/v1',
                 searchParams = {
                     key: that.googleApiKey,
                     cx: that.googleCustomSearchId,
                     q: encodeURIComponent(query),
                     start: start,
-                    num: perPage,
+                    num: count,
                     callback: __jsonpProxyFuncName
                 };
 
@@ -139,9 +139,42 @@
             });
         },
 
-        getResults: function() {
-            var that = this;
-            return that.results;
+        getPages: function(totalResults, perPage) {
+            var that = this,
+                totalResults = (typeof totalResults !== 'undefined') ? totalResults : that.totalResults,
+                count = (typeof perPage !== 'undefined') ? perPage : that.count,
+
+            /* TODO: Google results limit - http://productforums.google.com/forum/#!topic/customsearch/iafqT6dl2VM */
+                itemsLimit = 100,
+                totalPages = Math.round(totalResults / count),
+                pageNum, start, end, count,
+                pages = [];
+
+            if (totalResults === 0) {
+                return null;
+            }
+
+            for (var i = 1; i <= totalPages; i++) {
+                pageNum = i;
+                start = ((pageNum * count) - count) + 1;
+                end = pageNum * count;
+
+                if (end > itemsLimit) {
+                    count = itemsLimit - start;
+                }
+
+                pages.push({
+                    num: pageNum,
+                    start: start,
+                    count: count
+                });
+
+                if (end >= itemsLimit) {
+                    break;
+                }
+            }
+
+            return pages;
         }
     };
 
