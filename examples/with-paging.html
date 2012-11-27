@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script type="text/javascript" src="../src/search.js"></script>
+<script type="text/javascript">
+window.onload = function()
+{
+    var search = new GoogleCustomSearch({
+        // take it from here https://code.google.com/apis/console/
+        googleApiKey: 'AIzaSyBf3nMB7quDenHfwwoQKXkT2vpJ4wNnRck',
+
+        // http://www.google.com/cse/
+        googleCustomSearchId: '006808882770449640747:oblas80q8sg',
+
+        // callback
+        onProcessResults: function(results) {
+            var that = this,
+                i, len,
+                item, resultsStr = '',
+                pages, pagesNodes;
+
+            if (that.hasError) {
+                alert(that.error.code + ": " + that.error.message);
+            }
+            else {
+                // create results HTML
+                for (i = 0, len = results.items.length; i < len; i++) {
+                    item = results.items[i];
+
+                    resultsStr += '<p>';
+                    resultsStr += '<a href="'+ item.link +'" target="_blank">'
+                            + item.htmlTitle + '</a>';
+
+                    resultsStr += '<br>';
+                    resultsStr += item.htmlSnippet;
+                    resultsStr += '</p>';
+                }
+
+                // render search results
+                document.getElementById('search-results').innerHTML = resultsStr;
+
+
+
+                // create paging HTML-nodes
+                var pages = search.getPages();
+                var pagesNodes = createPagingNodes(pages, search);
+
+                // render paging
+                document.getElementById('search-results').appendChild(pagesNodes);
+            }
+        }
+    });
+
+
+    // form handler
+    document.getElementById('search-form').onsubmit = function() {
+        var searchInput = document.getElementById('search-query');
+
+        if (searchInput.value.length > 2 && !search.isBusy) {
+            document.getElementById('search-results').innerHTML = 'loading...';
+            search.doSearch(searchInput.value, 1);
+        }
+        return false;
+    }
+};
+
+function createPagingNodes(pages, searchInstance) {
+    var i, len,
+        page,
+        pagesContainer,
+        pageNode;
+
+    if (pages === null) {
+        return false;
+    }
+
+    pagesContainer = document.createElement('div');
+    pagesContainer.className = 'search-paging';
+
+    for (i = 0, len = pages.length; i < len; i++) {
+        page = pages[i];
+        pageNode = document.createElement('span');
+        pageNode.className = 'page-num';
+        pageNode.innerHTML = page.num;
+
+        if (searchInstance.currentPage === page.num) {
+            pageNode.className += ' active';
+        }
+
+        // click handler
+        (function(page){
+            pageNode.onclick = function()
+            {
+                if (this.className.indexOf('active') != -1) {
+                    return false;
+                }
+
+                var others = this.parentNode.getElementsByTagName('span');
+                for (var i = 0; i < others.length; i++) {
+                    others[i].className = others[i].className.replace(' active', '');
+                }
+                this.className += ' active';
+                searchInstance.currentPage = page.num;
+                searchInstance.doSearch(document.getElementById('search-query').value, page.num);
+            };
+        })(page);
+
+        pagesContainer.appendChild(pageNode);
+    }
+
+    return pagesContainer;
+}
+</script>
+
+<style type="text/css">
+.search-paging {
+    margin:10px 0;
+}
+
+.search-paging .page-num {
+    cursor:pointer;
+    display:inline-block;
+    margin-right:5px;
+    background-color:#0F53C2;
+    padding:1px 4px;
+    color:#fff;
+}
+
+    .search-paging .page-num:hover {
+        background-color:#2788FF;
+    }
+
+    .search-paging .page-num.active {
+        cursor:default;
+        background-color:#68696A;
+    }
+
+</style>
+</head>
+<body>
+
+<form id="search-form" action="">
+    <input type="text" id="search-query" value="">
+    <input type="submit">
+</form>
+
+<div id="search-results"></div>
+
+</body>
+</html>
