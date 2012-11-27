@@ -115,6 +115,7 @@
                     cx: that.googleCustomSearchId,
                     q: encodeURIComponent(query),
                     start: start,
+                    num: perPage,
                     callback: __jsonpProxyFuncName
                 };
 
