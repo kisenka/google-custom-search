@@ -6,7 +6,7 @@
 <script type="text/javascript">
 window.onload = function()
 {
-    s = new GoogleCustomSearch({
+    var search = new GoogleCustomSearch({
         // take it from here https://code.google.com/apis/console/
         googleApiKey: 'AIzaSyBf3nMB7quDenHfwwoQKXkT2vpJ4wNnRck',
 
@@ -14,41 +14,38 @@ window.onload = function()
         googleCustomSearchId: '006808882770449640747:oblas80q8sg',
 
         // callback
-        onProcessResults: processSearchResults
-    });
+        onProcessResults: function(results) {
+            var that = this,
+                    i, len,
+                    item, resultsStr = '';
 
-    function processSearchResults(results) {
-        var that = this,
-            i, len,
-            item, resultsStr = '';
-
-        if (that.hasError) {
-            alert(that.error.message);
-        }
-        else {
-            for (i = 0, len = results.items.length; i < len; i++) {
-                item = results.items[i];
-
-                resultsStr += '<p>';
-                resultsStr += '<a href="'+ item.link +'" target="_blank">'
-                        + item.htmlTitle + '</a>';
-                resultsStr += '<br>';
-                resultsStr += item.htmlSnippet;
-                resultsStr += '</p>';
+            if (that.hasError) {
+                alert(that.error.message);
             }
+            else {
+                for (i = 0, len = results.items.length; i < len; i++) {
+                    item = results.items[i];
 
-            document.getElementById('search-results').innerHTML = resultsStr;
+                    resultsStr += '<p>';
+                    resultsStr += '<a href="'+ item.link +'" target="_blank">'
+                            + item.htmlTitle + '</a>';
+                    resultsStr += '<br>';
+                    resultsStr += item.htmlSnippet;
+                    resultsStr += '</p>';
+                }
+
+                document.getElementById('search-results').innerHTML = resultsStr;
+            }
         }
-    }
-
+    });
 
     // form handler
     document.getElementById('search-form').onsubmit = function() {
         var searchInput = document.getElementById('search-query');
 
-        if (searchInput.value.length > 2) {
+        if (searchInput.value.length > 2 && !search.isBusy) {
             document.getElementById('search-results').innerHTML = 'loading...';
-            s.doSearch(searchInput.value);
+            search.doSearch(searchInput.value);
         }
         return false;
     }
@@ -58,7 +55,7 @@ window.onload = function()
 <body>
 
 <form id="search-form" action="">
-    <input type="text" id="search-query" value="Obama">
+    <input type="text" id="search-query" value="">
     <input type="submit">
 </form>
 
